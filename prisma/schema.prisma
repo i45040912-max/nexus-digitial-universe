@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+  passwordHash String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  projects Project[]
+  tasks Task[]
+  notes Note[]
+}
+model Project {
+  id String @id @default(cuid())
+  title String
+  description String @default("")
+  status String @default("IN_PROGRESS")
+  color String @default("violet")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  @@index([ownerId, updatedAt])
+}
+model Task {
+  id String @id @default(cuid())
+  title String
+  description String @default("")
+  completed Boolean @default(false)
+  priority String @default("MEDIUM")
+  dueDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  @@index([ownerId, updatedAt])
+}
+model Note {
+  id String @id @default(cuid())
+  title String
+  content String @default("")
+  tags String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  @@index([ownerId, updatedAt])
+}
